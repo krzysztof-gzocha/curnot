@@ -9,20 +9,22 @@ import (
 	"github.com/pkg/errors"
 )
 
+const NameOpenExchangeRates = "openexchangerates.org"
+
 type Provider struct {
 	client HttpClientInterface
 	apiKey string
 }
 
 type openExchangeResponse struct {
-	Rates map[string]float32 `json:"rates"`
+	Rates map[string]float64 `json:"rates"`
 }
 
 func NewOpenExchangeProvider(client HttpClientInterface, apiKey string) *Provider {
 	return &Provider{client: client, apiKey: apiKey}
 }
 
-func (cp *Provider) GetCurrencyExchangeFactor(base, second string) (float32, error) {
+func (cp *Provider) GetCurrencyExchangeFactor(base, second string) (float64, error) {
 	response, err := cp.client.Get(buildUrl(cp.apiKey, base, second))
 	if err != nil {
 		return 0, err
