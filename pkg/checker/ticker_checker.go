@@ -22,6 +22,7 @@ func NewTickerChecker(
 
 func (t *TickerChecker) Check() error {
 	for range t.ticker.C {
+		fmt.Println("Checking..")
 		err := t.checker.Check()
 		if err != nil {
 			fmt.Println(err.Error())

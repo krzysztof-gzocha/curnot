@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/0xAX/notificator"
 	"github.com/jinzhu/configor"
 	"github.com/krzysztof-gzocha/curnot/pkg/aggregator"
 	"github.com/krzysztof-gzocha/curnot/pkg/checker"
@@ -15,7 +16,8 @@ import (
 
 const configFile = "config.yml"
 const timeout = time.Second * 10
-const tickInterval = time.Hour
+
+// const tickInterval = time.Second * 5
 
 func main() {
 	cfg := config.Config{}
@@ -30,14 +32,17 @@ func main() {
 	}
 
 	providersPool := currency.GetProvidersPool(httpClient, cfg.Providers)
-	desktopNotifier := notifier.NewDesktop()
-	ticker := time.NewTicker(tickInterval)
+	desktopNotifier := notifier.NewDesktop(notificator.New(notificator.Options{
+		AppName: "Currency notifier",
+	}))
+	ticker := time.NewTicker(cfg.Interval)
 	agg := aggregator.NewRateAggregator(desktopNotifier, cfg.Currencies)
 	tickerChecker := checker.NewTickerChecker(
 		ticker,
 		checker.NewChecker(cfg.Currencies, providersPool, agg),
 	)
 
+	fmt.Println("Starting..")
 	err = tickerChecker.Check()
 	fmt.Println(err.Error())
 }

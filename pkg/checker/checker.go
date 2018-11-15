@@ -1,7 +1,7 @@
 package checker
 
 import (
-	"time"
+	"fmt"
 
 	"github.com/krzysztof-gzocha/curnot/pkg/aggregator"
 	"github.com/krzysztof-gzocha/curnot/pkg/config"
@@ -35,6 +35,7 @@ func (c *Checker) Check() error {
 	for _, currencyConfig := range c.currencies {
 		provider, exists := c.providers[currencyConfig.ProviderName]
 		if !exists {
+			fmt.Printf("Provider %s for %s%s does not exist", currencyConfig.ProviderName, currencyConfig.From, currencyConfig.To)
 			continue
 		}
 
@@ -44,13 +45,10 @@ func (c *Checker) Check() error {
 		}
 
 		c.aggregator.Aggregate(&aggregator.Rate{
-			From:      currencyConfig.From,
-			To:        currencyConfig.To,
-			Rate:      currencyRate,
-			FetchTime: time.Now(),
+			From: currencyConfig.From,
+			To:   currencyConfig.To,
+			Rate: currencyRate,
 		})
-
-		return err
 	}
 
 	return nil

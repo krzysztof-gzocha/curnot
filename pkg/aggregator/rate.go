@@ -1,17 +1,20 @@
 package aggregator
 
 import (
+	"fmt"
 	"strings"
-	"time"
 
 	"github.com/krzysztof-gzocha/curnot/pkg/config"
 )
 
 type Rate struct {
-	FetchTime time.Time
-	From      string
-	To        string
-	Rate      float64
+	From string
+	To   string
+	Rate float64
+}
+
+func (r *Rate) String() string {
+	return fmt.Sprintf("%s%s", r.From, r.To)
 }
 
 func (r *Rate) supports(c config.CurrencyConfig) bool {

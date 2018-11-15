@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const NameOpenExchangeRates = "openexchangerates.org"
+const NameOpenExchangeRates = "openexchangerates"
 
 type Provider struct {
 	client HttpClientInterface

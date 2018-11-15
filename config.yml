@@ -1,0 +1,15 @@
+interval: 5s
+providers:
+  openexchangerates:
+    app_key: "f098fea610f64779ae46f8fae5324685"
+currencies:
+  - from: USD
+    to: PLN
+    provider_name: openexchangerates
+    alert:
+      any_change: true
+#  - from: EUR
+#    to: PLN
+#    provider_name: openexchangerates
+#    alert:
+#      any_change: true

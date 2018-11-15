@@ -6,9 +6,9 @@ type Desktop struct {
 	notifier *notificator.Notificator
 }
 
-func NewDesktop() *Desktop {
+func NewDesktop(notifier *notificator.Notificator) *Desktop {
 	return &Desktop{
-		notifier: &notificator.Notificator{},
+		notifier: notifier,
 	}
 }
 
