@@ -17,7 +17,15 @@ import (
 const configFile = "config.yml"
 const timeout = time.Second * 10
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 func main() {
+	fmt.Printf("%v, commit %v, built at %v", version, commit, date)
+
 	cfg := config.Config{}
 	err := configor.Load(&cfg, configFile)
 	if err != nil {
