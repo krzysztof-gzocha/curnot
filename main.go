@@ -17,8 +17,6 @@ import (
 const configFile = "config.yml"
 const timeout = time.Second * 10
 
-// const tickInterval = time.Second * 5
-
 func main() {
 	cfg := config.Config{}
 	err := configor.Load(&cfg, configFile)

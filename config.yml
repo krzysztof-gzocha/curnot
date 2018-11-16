@@ -1,15 +1,16 @@
-interval: 5s
+interval: 15s
 providers:
-  openexchangerates:
-    app_key: "f098fea610f64779ae46f8fae5324685"
+  currencyConverter: ~
+  openExchangeRates:
+    app_key: "<PASTE YOUR KEY HERE>"
 currencies:
   - from: USD
     to: PLN
-    provider_name: openexchangerates
+    provider_name: currencyConverter
     alert:
       any_change: true
-#  - from: EUR
-#    to: PLN
-#    provider_name: openexchangerates
-#    alert:
-#      any_change: true
+  - from: EUR
+    to: PLN
+    provider_name: currencyConverter
+    alert:
+      any_change: true

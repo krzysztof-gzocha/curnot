@@ -9,9 +9,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-const NameOpenExchangeRates = "openexchangerates"
+const NameOpenExchangeRates = "openExchangeRates"
 
-type Provider struct {
+type OpenExchangeProvider struct {
 	client HttpClientInterface
 	apiKey string
 }
@@ -20,12 +20,12 @@ type openExchangeResponse struct {
 	Rates map[string]float64 `json:"rates"`
 }
 
-func NewOpenExchangeProvider(client HttpClientInterface, apiKey string) *Provider {
-	return &Provider{client: client, apiKey: apiKey}
+func NewOpenExchangeProvider(client HttpClientInterface, apiKey string) *OpenExchangeProvider {
+	return &OpenExchangeProvider{client: client, apiKey: apiKey}
 }
 
-func (cp *Provider) GetCurrencyExchangeFactor(base, second string) (float64, error) {
-	response, err := cp.client.Get(buildUrl(cp.apiKey, base, second))
+func (cp *OpenExchangeProvider) GetCurrencyExchangeFactor(base, second string) (float64, error) {
+	response, err := cp.client.Get(cp.buildUrl(cp.apiKey, base, second))
 	if err != nil {
 		return 0, err
 	}
@@ -33,15 +33,15 @@ func (cp *Provider) GetCurrencyExchangeFactor(base, second string) (float64, err
 	content, err := ioutil.ReadAll(response.Body)
 	defer response.Body.Close()
 
+	if err != nil {
+		return 0, errors.Wrapf(err, "Could not read response body for %s/%s", base, second)
+	}
+
 	if response.StatusCode != http.StatusOK {
 		return 0, errors.Errorf("Response status: %d. Content: '%s'", response.StatusCode, string(content))
 	}
 
 	responseBody := openExchangeResponse{}
-	if err != nil {
-		return 0, errors.Wrapf(err, "Could not read response body for %s/%s", base, second)
-	}
-
 	err = json.Unmarshal(content, &responseBody)
 	if err != nil {
 		return 0, errors.Wrapf(err, "Could not unmarshal response body: %s", content)
@@ -55,7 +55,7 @@ func (cp *Provider) GetCurrencyExchangeFactor(base, second string) (float64, err
 	return rate, nil
 }
 
-func buildUrl(apiKey, base, second string) string {
+func (cp *OpenExchangeProvider) buildUrl(apiKey, base, second string) string {
 	values := &url.Values{}
 	address := &url.URL{}
 	values.Set("app_id", apiKey)

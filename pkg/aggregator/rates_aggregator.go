@@ -53,7 +53,7 @@ func (ra *RateAggregator) Aggregate(newRate *Rate) error {
 
 func (ra *RateAggregator) notify(newRate *Rate) error {
 	msg := bytes.NewBufferString(fmt.Sprintf(
-		"1 %s = %.2f %s",
+		"1 %s = %.4f %s",
 		newRate.From,
 		newRate.Rate,
 		newRate.To,
