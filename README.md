@@ -1,3 +1,15 @@
+# Currency Notifier
+Small golang program capable of periodically checking different currencies exchange rates with different providers.
+
+# Implemented providers
+- currencyConverter - https://free.currencyconverterapi.com
+- openExchangeRates - https://openExchangeRates.org
+
+## Have a look at releases to download compiled version
+
+# Config example
+
+```yaml
 # Configure interval of notifications. Default is 30 minutes
 # Examples:
 # 60s => 60 seconds
@@ -23,3 +35,6 @@ currencies:
       below: 3.75
       above: 3.85
       #any_change: true
+```
+
+# Project is under development
