@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/0xAX/notificator"
 	"github.com/jinzhu/configor"
 	"github.com/krzysztof-gzocha/curnot/pkg/aggregator"
 	"github.com/krzysztof-gzocha/curnot/pkg/checker"
@@ -24,7 +23,7 @@ var (
 )
 
 func main() {
-	fmt.Printf("%v, commit %v, built at %v", version, commit, date)
+	fmt.Printf("Version: %v\nCommit %v\nBuilt at %v\n\n", version, commit, date)
 
 	cfg := config.Config{}
 	err := configor.Load(&cfg, configFile)
@@ -38,9 +37,7 @@ func main() {
 	}
 
 	providersPool := currency.GetProvidersPool(httpClient, cfg.Providers)
-	desktopNotifier := notifier.NewDesktop(notificator.New(notificator.Options{
-		AppName: "Currency notifier",
-	}))
+	desktopNotifier := notifier.NewDesktop()
 	ticker := time.NewTicker(cfg.Interval)
 	agg := aggregator.NewRateAggregator(desktopNotifier, cfg.Currencies)
 	tickerChecker := checker.NewTickerChecker(

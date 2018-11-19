@@ -1,20 +1,26 @@
+// +build linux darwin freebsd
+
 package notifier
 
-import "github.com/0xAX/notificator"
+import (
+	"github.com/0xAX/notificator"
+)
 
 type Desktop struct {
 	notifier *notificator.Notificator
 }
 
-func NewDesktop(notifier *notificator.Notificator) *Desktop {
+func NewDesktop() *Desktop {
 	return &Desktop{
-		notifier: notifier,
+		notifier: notificator.New(notificator.Options{
+			AppName: NotificationAppName,
+		}),
 	}
 }
 
 func (d *Desktop) Notify(msg string) error {
 	return d.notifier.Push(
-		"Currency notifier",
+		NotificationTitle,
 		msg,
 		"",
 		notificator.UR_NORMAL,

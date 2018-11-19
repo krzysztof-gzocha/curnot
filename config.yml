@@ -20,6 +20,6 @@ currencies:
     to: PLN
     provider_name: currencyConverter
     alert:
-      below: 3.75
-      above: 3.85
-      #any_change: true
+      any_change: true # remove this if you will configure "below" or "above" parameters
+#      below: 3.75
+#      above: 3.85

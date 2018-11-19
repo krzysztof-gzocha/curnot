@@ -2,8 +2,12 @@ github.com/0xAX/notificator v0.0.0-20181105090803-d81462e38c21 h1:moSC7ACaTejHmV
 github.com/0xAX/notificator v0.0.0-20181105090803-d81462e38c21/go.mod h1:NtXa9WwQsukMHZpjNakTTz0LArxvGYdPA9CjIcUSZ6s=
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
+github.com/go-toast/toast v0.0.0-20180812000517-0a84660828b2 h1:wnvrXx5C19RCuIws90bJY39pXGg2sNaEr+opsVuouuA=
+github.com/go-toast/toast v0.0.0-20180812000517-0a84660828b2/go.mod h1:kW3HQ4UdaAyrUCSSDR4xUzBKW6O2iA4uHhk7AtyYp10=
 github.com/jinzhu/configor v0.0.0-20180614024415-4edaf76fe188 h1:XFhKsrhg0SBbAGFKWbwK81YkfbNyO2QItYQ05jqbpAU=
 github.com/jinzhu/configor v0.0.0-20180614024415-4edaf76fe188/go.mod h1:xycrO0mK6seJRAHXsdyk54QgPJ20aQNpTGi5xv8jQg8=
+github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d h1:VhgPp6v9qf9Agr/56bj7Y/xa04UccTW04VP0Qed4vnQ=
+github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d/go.mod h1:YUTz3bUH2ZwIWBy3CJBeOBEugqcmXREj14T+iG/4k4U=
 github.com/pkg/errors v0.8.0 h1:WdK/asTD0HN+q6hsWO3/vpuAkAr+tw6aNJNDFFf0+qw=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
