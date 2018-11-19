@@ -59,11 +59,15 @@ func (c *Checker) Check() error {
 			currencyConfig.To,
 		)
 
-		c.aggregator.Aggregate(&aggregator.Rate{
+		err = c.aggregator.Aggregate(&aggregator.Rate{
 			From: currencyConfig.From,
 			To:   currencyConfig.To,
 			Rate: currencyRate,
 		})
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
