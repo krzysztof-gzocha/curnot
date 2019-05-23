@@ -6,6 +6,8 @@ import (
 	"github.com/0xAX/notificator"
 )
 
+const NameDesktopNotifier = "desktop"
+
 type Desktop struct {
 	notifier *notificator.Notificator
 }

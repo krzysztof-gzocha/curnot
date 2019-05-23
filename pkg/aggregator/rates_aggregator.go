@@ -14,16 +14,16 @@ type RateAggregatorInterface interface {
 
 type RateAggregator struct {
 	lastRate        map[string]*Rate
-	notifier        notifier.NotifierInterface
+	notifierChain   notifier.NotifierChain
 	currencyConfigs []config.CurrencyConfig
 }
 
 func NewRateAggregator(
-	notifier notifier.NotifierInterface,
+	notifierChain *notifier.NotifierChain,
 	currencyConfig []config.CurrencyConfig,
 ) *RateAggregator {
 	return &RateAggregator{
-		notifier:        notifier,
+		notifierChain:   *notifierChain,
 		currencyConfigs: currencyConfig,
 		lastRate:        make(map[string]*Rate),
 	}
@@ -61,7 +61,7 @@ func (ra *RateAggregator) notify(newRate *Rate) error {
 
 	last, exists := ra.lastRate[newRate.String()]
 	if !exists || last.Rate == 0 || newRate.Rate == last.Rate {
-		return ra.notifier.Notify(msg.String())
+		return ra.notifierChain.Notify(msg.String())
 	}
 
 	// Add " (+12%)" to the notification
@@ -73,5 +73,5 @@ func (ra *RateAggregator) notify(newRate *Rate) error {
 	}
 	msg.WriteString(fmt.Sprintf("%.2f%%)", compare*100))
 
-	return ra.notifier.Notify(msg.String())
+	return ra.notifierChain.Notify(msg.String())
 }

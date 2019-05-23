@@ -6,6 +6,8 @@ import (
 	"github.com/go-toast/toast"
 )
 
+const NameDesktopNotifier = "desktop"
+
 type Desktop struct{}
 
 func NewDesktop() *Desktop {

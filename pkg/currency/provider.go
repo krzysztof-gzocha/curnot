@@ -26,9 +26,9 @@ func GetProvidersPool(
 		providers[NameOpenExchangeRates] = NewOpenExchangeProvider(client, openExchange.AppKey)
 	}
 
-	_, exists = providerConfigs[NameCurrencyConverter]
+	currencyConverter, exists := providerConfigs[NameCurrencyConverter]
 	if exists {
-		providers[NameCurrencyConverter] = NewCurrencyConverterProvider(client)
+		providers[NameCurrencyConverter] = NewCurrencyConverterProvider(client, currencyConverter.AppKey)
 	}
 
 	return providers
