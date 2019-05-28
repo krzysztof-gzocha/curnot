@@ -1,7 +1,6 @@
 package notifier
 
 import (
-	"fmt"
 	"github.com/go-mail/mail"
 	"github.com/krzysztof-gzocha/curnot/pkg/config"
 )
@@ -36,11 +35,9 @@ func (p *NotifierProvider) GetNotifiers() []NotifierInterface {
 		notifiers = append(notifiers, notifier)
 	}
 
-	desktopNotifier, exists := p.notifierConfig[NameDesktopNotifier]
+	_, exists = p.notifierConfig[NameDesktopNotifier]
 
 	if exists {
-		fmt.Println(desktopNotifier)
-
 		notifiers = append(notifiers, NewDesktop())
 	}
 
