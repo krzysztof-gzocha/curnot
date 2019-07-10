@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/krzysztof-gzocha/curnot/pkg/config"
-	"github.com/krzysztof-gzocha/curnot/pkg/notifier"
 )
 
 type RateAggregatorInterface interface {
@@ -14,16 +13,16 @@ type RateAggregatorInterface interface {
 
 type RateAggregator struct {
 	lastRate        map[string]*Rate
-	notifierChain   notifier.NotifierChain
+	notifier        NotifierInterface
 	currencyConfigs []config.CurrencyConfig
 }
 
 func NewRateAggregator(
-	notifierChain *notifier.NotifierChain,
+	notifier NotifierInterface,
 	currencyConfig []config.CurrencyConfig,
 ) *RateAggregator {
 	return &RateAggregator{
-		notifierChain:   *notifierChain,
+		notifier:        notifier,
 		currencyConfigs: currencyConfig,
 		lastRate:        make(map[string]*Rate),
 	}
@@ -61,7 +60,7 @@ func (ra *RateAggregator) notify(newRate *Rate) error {
 
 	last, exists := ra.lastRate[newRate.String()]
 	if !exists || last.Rate == 0 || newRate.Rate == last.Rate {
-		return ra.notifierChain.Notify(msg.String())
+		return ra.notifier.Notify(msg.String())
 	}
 
 	// Add " (+12%)" to the notification
@@ -73,5 +72,5 @@ func (ra *RateAggregator) notify(newRate *Rate) error {
 	}
 	msg.WriteString(fmt.Sprintf("%.2f%%)", compare*100))
 
-	return ra.notifierChain.Notify(msg.String())
+	return ra.notifier.Notify(msg.String())
 }

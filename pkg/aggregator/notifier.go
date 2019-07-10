@@ -1,4 +1,4 @@
-package notifier
+package aggregator
 
 const NotificationAppName = "Currency Notifier"
 const NotificationTitle = "Currency alert"
