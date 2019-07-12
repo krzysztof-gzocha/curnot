@@ -7,8 +7,6 @@ import (
 	"github.com/krzysztof-gzocha/curnot/pkg/aggregator"
 )
 
-const NameDesktopNotifier = "desktop"
-
 type Desktop struct {
 	notifier *notificator.Notificator
 }

@@ -9,8 +9,6 @@ import (
 	"github.com/krzysztof-gzocha/curnot/pkg/formatter"
 )
 
-const NameEmailNotifier = "email"
-
 type Email struct {
 	dialer               mail.Dialer
 	receiverParameters   config.EmailReceiverParameters
