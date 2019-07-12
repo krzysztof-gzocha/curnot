@@ -14,11 +14,13 @@ const NameCurrencyConverter = "currencyConverter"
 
 type CurrencyConverterProvider struct {
 	client HttpClientInterface
+	apiKey string
 }
 
-func NewCurrencyConverterProvider(client HttpClientInterface) *CurrencyConverterProvider {
+func NewCurrencyConverterProvider(client HttpClientInterface, apiKey string) *CurrencyConverterProvider {
 	return &CurrencyConverterProvider{
 		client: client,
+		apiKey: apiKey,
 	}
 }
 
@@ -26,7 +28,7 @@ func (c *CurrencyConverterProvider) GetCurrencyExchangeFactor(
 	base,
 	second string,
 ) (float64, error) {
-	response, err := c.client.Get(c.buildUrl(base, second))
+	response, err := c.client.Get(c.buildUrl(c.apiKey, base, second))
 	if err != nil {
 		return 0, err
 	}
@@ -66,10 +68,11 @@ func (c *CurrencyConverterProvider) getCurrencyName(base, second string) string 
 }
 
 // https://free.currencyconverterapi.com/api/v5/convert?q=USD_PLN&compact=y
-func (c *CurrencyConverterProvider) buildUrl(base, second string) string {
+func (c *CurrencyConverterProvider) buildUrl(apiKey, base, second string) string {
 	values := &url.Values{}
 	values.Set("q", c.getCurrencyName(base, second))
 	values.Set("compact", "y")
+	values.Set("apiKey", apiKey)
 
 	uri := &url.URL{}
 	uri.Scheme = "https"

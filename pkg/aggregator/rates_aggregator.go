@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/krzysztof-gzocha/curnot/pkg/config"
-	"github.com/krzysztof-gzocha/curnot/pkg/notifier"
 )
 
 type RateAggregatorInterface interface {
@@ -14,12 +13,12 @@ type RateAggregatorInterface interface {
 
 type RateAggregator struct {
 	lastRate        map[string]*Rate
-	notifier        notifier.NotifierInterface
+	notifier        NotifierInterface
 	currencyConfigs []config.CurrencyConfig
 }
 
 func NewRateAggregator(
-	notifier notifier.NotifierInterface,
+	notifier NotifierInterface,
 	currencyConfig []config.CurrencyConfig,
 ) *RateAggregator {
 	return &RateAggregator{

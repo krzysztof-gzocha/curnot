@@ -37,9 +37,10 @@ func main() {
 	}
 
 	providersPool := currency.GetProvidersPool(httpClient, cfg.Providers)
-	desktopNotifier := notifier.NewDesktop()
+	notifierChain := notifier.NewNotifierChain(cfg.Notifiers)
+
 	ticker := time.NewTicker(cfg.Interval)
-	agg := aggregator.NewRateAggregator(desktopNotifier, cfg.Currencies)
+	agg := aggregator.NewRateAggregator(notifierChain, cfg.Currencies)
 	tickerChecker := checker.NewTickerChecker(
 		ticker,
 		checker.NewChecker(cfg.Currencies, providersPool, agg),

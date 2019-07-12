@@ -8,6 +8,23 @@ type Config struct {
 	Interval   time.Duration
 	Providers  map[string]ProviderConfig
 	Currencies []CurrencyConfig
+	Notifiers  map[string]NotifierConfig
+}
+
+type NotifierConfig struct {
+	EmailReceiverParameters EmailReceiverParameters   `yaml:"receiver"`
+	ConnectionParameters    EmailConnectionParameters `yaml:"connection_parameters"`
+}
+
+type EmailConnectionParameters struct {
+	Host     string
+	Port     int
+	Username string
+	Password string
+}
+
+type EmailReceiverParameters struct {
+	Email string
 }
 
 type ProviderConfig struct {

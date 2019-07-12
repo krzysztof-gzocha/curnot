@@ -21,7 +21,8 @@ interval: 30m
 # I recommend to use currencyConverter by default, but if you need openExchangeRates.org
 # you just need to uncomment the configuration and paste your application key
 providers:
-  currencyConverter: ~
+  currencyConverter:
+    app_key: "<PASTE YOUR KEY HERE>"
 #  openExchangeRates:
 #    app_key: "<PASTE YOUR KEY HERE>"
 
@@ -35,6 +36,18 @@ currencies:
       below: 3.75
       above: 3.85
       #any_change: true
+# Notifiers section is configuring available notifiers that can be used. 
+# You can disable each one by commenting it out.
+notifiers:
+  desktop: ~
+  email:
+    receiver:
+      email: john@example.com
+    connection_parameters:
+      host: example.com
+      port: 465
+      username: john@example.com
+      password: secretPassword
 ```
 
 # Project is under development
