@@ -4,6 +4,7 @@ Small golang program capable of periodically checking different currencies excha
 # Implemented providers
 - currencyConverter - https://free.currencyconverterapi.com
 - openExchangeRates - https://openExchangeRates.org
+- freeCurrencyApi -  https://api.freecurrencyapi.com
 
 ## Have a look at releases to download compiled version
 
@@ -25,6 +26,8 @@ providers:
     app_key: "<PASTE YOUR KEY HERE>"
 #  openExchangeRates:
 #    app_key: "<PASTE YOUR KEY HERE>"
+#  freeCurrencyApi:
+#    app_key: "<PASTE YOUR KEY HERE>"
 
 # Currencies section is configuring all the currencies you would like to track.
 # Feel free to add more, but 1 currency rate will result in 1 notification.
@@ -33,11 +36,9 @@ currencies:
     to: PLN
     provider_name: currencyConverter
     alert:
-      below: 3.75
-      above: 3.85
-      #any_change: true
-# Notifiers section is configuring available notifiers that can be used. 
-# You can disable each one by commenting it out.
+      any_change: true # remove this if you will configure "below" or "above" parameters
+#      below: 3.75
+#      above: 3.85
 notifiers:
   desktop: ~
   email:
@@ -48,6 +49,16 @@ notifiers:
       port: 465
       username: john@example.com
       password: secretPassword
+  http:
+    method: POST
+    path: https://192.168.1.27:8123/api/states/sensor.currency_eur_to_pln # Works with HomeAssistant
+    extra_headers:
+      Authorization: Bearer SOME_TOKEN
+    accepted_response_statuses:
+      - 200
+      - 201
+      - 202
+
 ```
 
 # Project is under development
