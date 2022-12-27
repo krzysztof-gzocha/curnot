@@ -37,10 +37,11 @@ notifiers:
       username: john@example.com
       password: secretPassword
   http:
-    http_parameters: # structure to be improved
-        method: POST
-        path: https://192.168.1.27:8123/api/something
-        accepted_response_statuses:
-          - 200
-          - 201
-          - 202
+    method: POST
+    path: https://192.168.1.27:8123/api/states/sensor.currency_eur_to_pln
+    extra_headers:
+      Authorization: Bearer SOME_TOKEN
+    accepted_response_statuses:
+      - 200
+      - 201
+      - 202

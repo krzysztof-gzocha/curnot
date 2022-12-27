@@ -2,6 +2,7 @@ package aggregator
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/krzysztof-gzocha/curnot/pkg/config"
 )
@@ -34,11 +35,11 @@ func (ra *MultipleRatesAggregator) Aggregate(ctx context.Context, newRate *Rate)
 		}
 
 		if !newRate.shouldNotify(currencyConfig.Alert) {
+			fmt.Println("Shouldn't notify, skipping..")
 			continue
 		}
 
 		err := ra.notify(ctx, newRate)
-
 		if err != nil {
 			return err
 		}

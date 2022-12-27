@@ -11,20 +11,16 @@ import (
 	"github.com/krzysztof-gzocha/curnot/pkg/formatter"
 )
 
-const NameNotifierDesktop = "desktop"
-const NameNotifierEmail = "email"
-const NameNotifierHttp = "http"
-
 type Provider interface {
 	GetNotifiers() []aggregator.Notifier
 }
 
 type Chain struct {
 	client         *http.Client
-	notifierConfig map[string]config.NotifierConfig
+	notifierConfig config.NotifiersConfig
 }
 
-func NewChain(c *http.Client, notifierConfig map[string]config.NotifierConfig) *Chain {
+func NewChain(c *http.Client, notifierConfig config.NotifiersConfig) *Chain {
 	return &Chain{client: c, notifierConfig: notifierConfig}
 }
 
@@ -48,9 +44,7 @@ func (c *Chain) Notify(ctx context.Context, msg aggregator.RateChange) error {
 func (c *Chain) GetNotifiers(client *http.Client) ([]aggregator.Notifier, error) {
 	var notifiers []aggregator.Notifier
 
-	emailNotifierConfig, exists := c.notifierConfig[NameNotifierEmail]
-
-	if exists {
+	if emailNotifierConfig := c.notifierConfig.EmailConfig; emailNotifierConfig != nil {
 		dialer := mail.NewDialer(
 			emailNotifierConfig.ConnectionParameters.Host,
 			emailNotifierConfig.ConnectionParameters.Port,
@@ -68,15 +62,12 @@ func (c *Chain) GetNotifiers(client *http.Client) ([]aggregator.Notifier, error)
 		notifiers = append(notifiers, notifier)
 	}
 
-	_, exists = c.notifierConfig[NameNotifierDesktop]
-
-	if exists {
+	if c.notifierConfig.Desktop != nil {
 		notifiers = append(notifiers, NewDesktop())
 	}
 
-	httpConfig, exists := c.notifierConfig[NameNotifierHttp]
-	if exists {
-		u, err := url.Parse(httpConfig.HttpParameters.Path)
+	if httpConfig := c.notifierConfig.HttpConfig; httpConfig != nil {
+		u, err := url.Parse(httpConfig.Path)
 		if err != nil {
 			return notifiers, err
 		}
@@ -84,8 +75,9 @@ func (c *Chain) GetNotifiers(client *http.Client) ([]aggregator.Notifier, error)
 		notifiers = append(notifiers, NewHttp(
 			client,
 			*u,
-			httpConfig.HttpParameters.Method,
-			httpConfig.HttpParameters.AcceptedResponseStatuses,
+			httpConfig.Method,
+			httpConfig.AcceptedResponseStatuses,
+			httpConfig.ExtraHeaders,
 		))
 	}
 

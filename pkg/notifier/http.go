@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -16,23 +17,43 @@ type Http struct {
 	url              url.URL
 	method           string
 	acceptedStatuses []int
+	extraHeaders     map[string]string
 }
 
-func NewHttp(client *http.Client, url url.URL, method string, acceptedStatuses []int) *Http {
-	return &Http{client: client, url: url, method: method, acceptedStatuses: acceptedStatuses}
+func NewHttp(
+	client *http.Client,
+	url url.URL,
+	method string,
+	acceptedStatuses []int,
+	extraHeaders map[string]string,
+) *Http {
+	return &Http{
+		client:           client,
+		url:              url,
+		method:           method,
+		acceptedStatuses: acceptedStatuses,
+		extraHeaders:     extraHeaders,
+	}
 }
 
 type request struct {
-	Old *aggregator.Rate `json:"old,omitempty"`
-	New *aggregator.Rate `json:"new,omitempty"`
-	Msg string           `json:"message"`
+	State      string       `json:"state"`
+	Attributes requestAttrs `json:"attributes"`
+}
+
+type requestAttrs struct {
+	UnitOfMeasurement string `json:"unit_of_measurement"`
+	FriendlyName      string `json:"friendly_name"`
 }
 
 func (h *Http) Notify(ctx context.Context, rateChange aggregator.RateChange) error {
+	fmt.Println("Sending HTTP notification")
 	r := request{
-		Old: rateChange.Old,
-		New: rateChange.New,
-		Msg: rateChange.String(),
+		State: fmt.Sprintf("%.3f", rateChange.New.Rate),
+		Attributes: requestAttrs{
+			UnitOfMeasurement: rateChange.New.To,
+			FriendlyName:      fmt.Sprintf("%s to %s", rateChange.New.From, rateChange.New.To),
+		},
 	}
 
 	body := bytes.NewBufferString("")
@@ -43,6 +64,10 @@ func (h *Http) Notify(ctx context.Context, rateChange aggregator.RateChange) err
 	httpReq, err := http.NewRequest(h.method, h.url.String(), body)
 	if err != nil {
 		return err
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+	for header, value := range h.extraHeaders {
+		httpReq.Header.Set(header, value)
 	}
 
 	resp, err := h.client.Do(httpReq.WithContext(ctx))
@@ -57,10 +82,13 @@ func (h *Http) Notify(ctx context.Context, rateChange aggregator.RateChange) err
 			}
 		}
 
-		return fmt.Errorf("wrong HTTP status: %d", resp.StatusCode)
+		bod, _ := io.ReadAll(resp.Body)
+		_ = resp.Body.Close()
+
+		return fmt.Errorf("wrong HTTP status: %d\n\nContent: %s\n\n", resp.StatusCode, bod)
 	}
 
-	fmt.Printf("HTTP notification was sent successfully")
+	fmt.Println("HTTP notification was sent successfully")
 
 	return nil
 }

@@ -1,9 +1,11 @@
 package currency
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 )
@@ -34,8 +36,14 @@ func (f *FreeCurrencyApi) GetCurrencyExchangeFactor(ctx context.Context, base, s
 		return 0, err
 	}
 
+	buf, err := io.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return 0, err
+	}
+
 	respStruct := freeCurrencyApiResponse{}
-	if err := json.NewDecoder(resp.Body).Decode(&respStruct); err != nil {
+	if err := json.NewDecoder(bytes.NewReader(buf)).Decode(&respStruct); err != nil {
 		return 0, err
 	}
 
@@ -50,7 +58,7 @@ func (f *FreeCurrencyApi) GetCurrencyExchangeFactor(ctx context.Context, base, s
 func (f *FreeCurrencyApi) buildUrl(base, second string) string {
 	values := &url.Values{}
 	values.Set("apikey", f.apiKey)
-	values.Set("base", base)
+	values.Set("base_currency", base)
 	values.Set("currencies", second)
 
 	address := &url.URL{}

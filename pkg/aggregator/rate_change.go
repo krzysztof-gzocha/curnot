@@ -19,14 +19,13 @@ func (r RateChange) String() string {
 		)
 	}
 
-	msg := ""
+	msg := "1 %s = %.3f %s"
 	compare := r.New.Rate / r.Old.Rate
 	if r.New.Rate > r.Old.Rate {
-		msg += " (+"
-	} else {
-		msg += " (-"
+		msg = " (+" + msg
+	} else if r.New.Rate <= r.Old.Rate {
+		msg += " (-" + msg
 	}
-	msg += "%.2f) 1 %s = %.3f %s"
 
 	return fmt.Sprintf(msg, compare, r.New.From, r.New.Rate, r.New.To)
 }

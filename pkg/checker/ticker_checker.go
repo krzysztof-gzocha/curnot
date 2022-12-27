@@ -21,22 +21,21 @@ func NewTickerChecker(
 	}
 }
 
-func (t *TickerChecker) Check(ctx context.Context) error {
+func (t *TickerChecker) StartChecking(ctx context.Context) {
 	ticker := time.NewTicker(t.duration)
+	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ticker.C:
-			fmt.Println("Checking..")
 			timedCtx, cancel := context.WithTimeout(ctx, t.duration)
 			err := t.checker.Check(timedCtx)
 			cancel()
 			if err != nil {
-				fmt.Println(err.Error())
+				fmt.Printf("=== Error: %+v\n", err)
 			}
 		case <-ctx.Done():
-			ticker.Stop()
-			return ctx.Err()
+			fmt.Printf("=== Timed out after %s\n", t.duration)
 		}
 	}
 }

@@ -6,21 +6,28 @@ import (
 
 type Config struct {
 	Interval   time.Duration
+	Timeout    time.Duration
 	Providers  map[string]ProviderConfig
 	Currencies []CurrencyConfig
-	Notifiers  map[string]NotifierConfig // @todo improve, so each notifier will have only its own cfg
+	Notifiers  NotifiersConfig
 }
 
-type NotifierConfig struct {
+type NotifiersConfig struct {
+	EmailConfig *EmailConfig `yaml:"email"`
+	HttpConfig  *HttpConfig  `yaml:"http"`
+	Desktop     *interface{} `yaml:"desktop"`
+}
+
+type EmailConfig struct {
 	EmailReceiverParameters EmailReceiverParameters   `yaml:"receiver"`
 	ConnectionParameters    EmailConnectionParameters `yaml:"connection_parameters"`
-	HttpParameters          HttpParams                `yaml:"http_parameters"`
 }
 
-type HttpParams struct {
-	Method                   string `yaml:"method"`
-	Path                     string `yaml:"path"`
-	AcceptedResponseStatuses []int  `yaml:"accepted_response_statuses"`
+type HttpConfig struct {
+	Method                   string            `yaml:"method"`
+	Path                     string            `yaml:"path"`
+	AcceptedResponseStatuses []int             `yaml:"accepted_response_statuses"`
+	ExtraHeaders             map[string]string `yaml:"extra_headers"`
 }
 
 type EmailConnectionParameters struct {
