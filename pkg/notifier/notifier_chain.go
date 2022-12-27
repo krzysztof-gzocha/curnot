@@ -5,10 +5,9 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/go-mail/mail"
 	"github.com/krzysztof-gzocha/curnot/pkg/aggregator"
 	"github.com/krzysztof-gzocha/curnot/pkg/config"
-	"github.com/krzysztof-gzocha/curnot/pkg/formatter"
+	"github.com/wneessen/go-mail"
 )
 
 type Provider interface {
@@ -45,18 +44,24 @@ func (c *Chain) GetNotifiers(client *http.Client) ([]aggregator.Notifier, error)
 	var notifiers []aggregator.Notifier
 
 	if emailNotifierConfig := c.notifierConfig.EmailConfig; emailNotifierConfig != nil {
-		dialer := mail.NewDialer(
+		client, err := mail.NewClient(
 			emailNotifierConfig.ConnectionParameters.Host,
-			emailNotifierConfig.ConnectionParameters.Port,
-			emailNotifierConfig.ConnectionParameters.Username,
-			emailNotifierConfig.ConnectionParameters.Password,
+			mail.WithPort(emailNotifierConfig.ConnectionParameters.Port),
+			mail.WithUsername(emailNotifierConfig.ConnectionParameters.Username),
+			mail.WithPassword(emailNotifierConfig.ConnectionParameters.Password),
+			mail.WithSMTPAuth(mail.SMTPAuthPlain),
+			mail.WithTLSPolicy(mail.TLSMandatory),
 		)
 
+		if err != nil {
+			return notifiers, err
+		}
+
 		notifier := NewEmail(
-			*dialer,
+			client,
+			mail.TypeTextHTML,
 			emailNotifierConfig.EmailReceiverParameters,
 			emailNotifierConfig.ConnectionParameters,
-			formatter.HtmlMessageFormatStrategy{},
 		)
 
 		notifiers = append(notifiers, notifier)

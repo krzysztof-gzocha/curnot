@@ -8,7 +8,8 @@ Small golang program capable of periodically checking different currencies excha
 
 ## Have a look at releases to download compiled version
 
-# Config example
+# Config example (curnot.yaml)
+## Put curnot.yaml in your $HOME directory
 
 ```yaml
 # Configure interval of notifications. Default is 30 minutes

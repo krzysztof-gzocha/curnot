@@ -7,7 +7,6 @@ import (
 	"github.com/krzysztof-gzocha/curnot/pkg/aggregator"
 	"github.com/krzysztof-gzocha/curnot/pkg/config"
 	"github.com/krzysztof-gzocha/curnot/pkg/currency"
-	"github.com/pkg/errors"
 )
 
 type Checker interface {
@@ -49,7 +48,7 @@ func (c *ProvidersChecker) Check(ctx context.Context) error {
 
 		currencyRate, err := provider.GetCurrencyExchangeFactor(ctx, currencyConfig.From, currencyConfig.To)
 		if err != nil {
-			return errors.Wrapf(err, "Could not fetch currency rate from provider '%s'", currencyConfig.ProviderName)
+			return fmt.Errorf("could not fetch currency rate from provider '%s': %w", currencyConfig.ProviderName, err)
 		}
 
 		fmt.Printf(

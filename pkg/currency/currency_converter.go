@@ -7,8 +7,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-
-	"github.com/pkg/errors"
 )
 
 const NameCurrencyConverter = "currencyConverter"
@@ -43,8 +41,8 @@ func (c *CurrencyConverterProvider) GetCurrencyExchangeFactor(
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return 0, errors.Errorf(
-			"Response status: %d, content: %s",
+		return 0, fmt.Errorf(
+			"response status: %d, content: %s",
 			response.StatusCode,
 			string(content),
 		)
@@ -58,12 +56,12 @@ func (c *CurrencyConverterProvider) GetCurrencyExchangeFactor(
 
 	currencyResponse, exists := responseBody[c.getCurrencyName(base, second)]
 	if !exists {
-		return 0, errors.Errorf("Response is not formatted correctly: %s", string(content))
+		return 0, fmt.Errorf("response is not formatted correctly: %s", string(content))
 	}
 
 	rate, exists := currencyResponse["val"]
 	if !exists {
-		return 0, errors.Errorf("Response is not formatted correctly: %s", string(content))
+		return 0, fmt.Errorf("response is not formatted correctly: %s", string(content))
 	}
 
 	return rate, nil
