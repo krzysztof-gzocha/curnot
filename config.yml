@@ -13,6 +13,8 @@ providers:
     app_key: "<PASTE YOUR KEY HERE>"
 #  openExchangeRates:
 #    app_key: "<PASTE YOUR KEY HERE>"
+#  freeCurrencyApi:
+#    app_key: "<PASTE YOUR KEY HERE>"
 
 # Currencies section is configuring all the currencies you would like to track.
 # Feel free to add more, but 1 currency rate will result in 1 notification.

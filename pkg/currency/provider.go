@@ -32,5 +32,10 @@ func GetProvidersPool(
 		providers[NameCurrencyConverter] = NewCurrencyConverterProvider(client, currencyConverter.AppKey)
 	}
 
+	freeCurrencyApi, exists := providerConfigs[NameFreeCurrencyApi]
+	if exists {
+		providers[NameFreeCurrencyApi] = NewFreeCurrencyApi(client, freeCurrencyApi.AppKey)
+	}
+
 	return providers
 }

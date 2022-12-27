@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -25,6 +26,7 @@ var (
 func main() {
 	fmt.Printf("Version: %v\nCommit %v\nBuilt at %v\n\n", version, commit, date)
 
+	ctx := context.Background()
 	cfg := config.Config{}
 	err := configor.Load(&cfg, configFile)
 	if err != nil {
@@ -39,14 +41,13 @@ func main() {
 	providersPool := currency.GetProvidersPool(httpClient, cfg.Providers)
 	notifierChain := notifier.NewChain(httpClient, cfg.Notifiers)
 
-	ticker := time.NewTicker(cfg.Interval)
 	agg := aggregator.NewRateAggregator(notifierChain, cfg.Currencies)
 	tickerChecker := checker.NewTickerChecker(
-		ticker,
+		cfg.Interval,
 		checker.NewChecker(cfg.Currencies, providersPool, agg),
 	)
 
-	fmt.Println("Starting..")
-	err = tickerChecker.Check()
+	fmt.Printf("Starting checking every %s..", cfg.Interval)
+	err = tickerChecker.Check(ctx)
 	fmt.Println(err.Error())
 }

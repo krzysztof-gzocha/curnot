@@ -1,33 +1,42 @@
 package checker
 
 import (
+	"context"
 	"fmt"
 	"time"
 )
 
 type TickerChecker struct {
-	ticker  *time.Ticker
-	checker Checker
+	duration time.Duration
+	checker  Checker
 }
 
 func NewTickerChecker(
-	ticker *time.Ticker,
+	ticker time.Duration,
 	checker Checker,
 ) *TickerChecker {
 	return &TickerChecker{
-		ticker:  ticker,
-		checker: checker,
+		duration: ticker,
+		checker:  checker,
 	}
 }
 
-func (t *TickerChecker) Check() error {
-	for range t.ticker.C {
-		fmt.Println("Checking..")
-		err := t.checker.Check()
-		if err != nil {
-			fmt.Println(err.Error())
+func (t *TickerChecker) Check(ctx context.Context) error {
+	ticker := time.NewTicker(t.duration)
+
+	for {
+		select {
+		case <-ticker.C:
+			fmt.Println("Checking..")
+			timedCtx, cancel := context.WithTimeout(ctx, t.duration)
+			err := t.checker.Check(timedCtx)
+			cancel()
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+		case <-ctx.Done():
+			ticker.Stop()
+			return ctx.Err()
 		}
 	}
-
-	return nil
 }
