@@ -1,4 +1,4 @@
-// +build windows
+//go:build windows
 
 package notifier
 
@@ -13,12 +13,12 @@ func NewDesktop() *Desktop {
 	return &Desktop{}
 }
 
-func (d *Desktop) Notify(msg string) error {
+func (d *Desktop) Notify(msg aggregator.RateChange) error {
 	notification := toast.Notification{
 		// https://github.com/go-toast/toast/issues/9
 		AppID:   "{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\\WindowsPowerShell\\v1.0\\powershell.exe",
 		Title:   aggregator.NotificationTitle,
-		Message: msg,
+		Message: msg.String(),
 	}
 
 	return notification.Push()

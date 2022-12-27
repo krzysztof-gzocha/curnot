@@ -1,6 +1,7 @@
 package notifier
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/go-mail/mail"
@@ -29,10 +30,10 @@ func NewEmail(
 	}
 }
 
-func (e *Email) Notify(msg string) error {
+func (e *Email) Notify(_ context.Context, msg aggregator.RateChange) error {
 	fmt.Println("Sending email")
 
-	return e.dialer.DialAndSend(e.getMessage(msg))
+	return e.dialer.DialAndSend(e.getMessage(msg.String()))
 }
 
 func (e *Email) getMessage(body string) *mail.Message {

@@ -1,8 +1,9 @@
 package currency
 
 import (
+	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -12,7 +13,7 @@ import (
 const NameOpenExchangeRates = "openExchangeRates"
 
 type OpenExchangeProvider struct {
-	client HttpClientInterface
+	client HttpDoer
 	apiKey string
 }
 
@@ -20,17 +21,21 @@ type openExchangeResponse struct {
 	Rates map[string]float64 `json:"rates"`
 }
 
-func NewOpenExchangeProvider(client HttpClientInterface, apiKey string) *OpenExchangeProvider {
+func NewOpenExchangeProvider(client HttpDoer, apiKey string) *OpenExchangeProvider {
 	return &OpenExchangeProvider{client: client, apiKey: apiKey}
 }
 
-func (cp *OpenExchangeProvider) GetCurrencyExchangeFactor(base, second string) (float64, error) {
-	response, err := cp.client.Get(cp.buildUrl(cp.apiKey, base, second))
+func (cp *OpenExchangeProvider) GetCurrencyExchangeFactor(ctx context.Context, base, second string) (float64, error) {
+	req, err := http.NewRequest(http.MethodGet, cp.buildUrl(cp.apiKey, base, second), nil)
+	if err != nil {
+		return 0, err
+	}
+	response, err := cp.client.Do(req.WithContext(ctx))
 	if err != nil {
 		return 0, err
 	}
 
-	content, err := ioutil.ReadAll(response.Body)
+	content, err := io.ReadAll(response.Body)
 	defer response.Body.Close()
 
 	if err != nil {

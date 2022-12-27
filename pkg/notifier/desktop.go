@@ -1,8 +1,10 @@
-// +build linux darwin freebsd
+//go:build linux || darwin || freebsd
 
 package notifier
 
 import (
+	"context"
+
 	"github.com/0xAX/notificator"
 	"github.com/krzysztof-gzocha/curnot/pkg/aggregator"
 )
@@ -19,10 +21,10 @@ func NewDesktop() *Desktop {
 	}
 }
 
-func (d *Desktop) Notify(msg string) error {
+func (d *Desktop) Notify(_ context.Context, msg aggregator.RateChange) error {
 	return d.notifier.Push(
 		aggregator.NotificationTitle,
-		msg,
+		msg.String(),
 		"",
 		notificator.UR_NORMAL,
 	)

@@ -1,34 +1,33 @@
 package aggregator
 
 import (
-	"bytes"
-	"fmt"
+	"context"
 
 	"github.com/krzysztof-gzocha/curnot/pkg/config"
 )
 
-type RateAggregatorInterface interface {
-	Aggregate(newRate *Rate) error
+type RateAggregator interface {
+	Aggregate(ctx context.Context, newRate *Rate) error
 }
 
-type RateAggregator struct {
+type MultipleRatesAggregator struct {
 	lastRate        map[string]*Rate
-	notifier        NotifierInterface
+	notifier        Notifier
 	currencyConfigs []config.CurrencyConfig
 }
 
 func NewRateAggregator(
-	notifier NotifierInterface,
+	notifier Notifier,
 	currencyConfig []config.CurrencyConfig,
-) *RateAggregator {
-	return &RateAggregator{
+) *MultipleRatesAggregator {
+	return &MultipleRatesAggregator{
 		notifier:        notifier,
 		currencyConfigs: currencyConfig,
 		lastRate:        make(map[string]*Rate),
 	}
 }
 
-func (ra *RateAggregator) Aggregate(newRate *Rate) error {
+func (ra *MultipleRatesAggregator) Aggregate(ctx context.Context, newRate *Rate) error {
 	for _, currencyConfig := range ra.currencyConfigs {
 		if !newRate.supports(currencyConfig) {
 			continue
@@ -38,7 +37,7 @@ func (ra *RateAggregator) Aggregate(newRate *Rate) error {
 			continue
 		}
 
-		err := ra.notify(newRate)
+		err := ra.notify(ctx, newRate)
 
 		if err != nil {
 			return err
@@ -50,27 +49,11 @@ func (ra *RateAggregator) Aggregate(newRate *Rate) error {
 	return nil
 }
 
-func (ra *RateAggregator) notify(newRate *Rate) error {
-	msg := bytes.NewBufferString(fmt.Sprintf(
-		"1 %s = %.4f %s",
-		newRate.From,
-		newRate.Rate,
-		newRate.To,
-	))
-
-	last, exists := ra.lastRate[newRate.String()]
-	if !exists || last.Rate == 0 || newRate.Rate == last.Rate {
-		return ra.notifier.Notify(msg.String())
+func (ra *MultipleRatesAggregator) notify(ctx context.Context, newRate *Rate) error {
+	rc := RateChange{New: newRate}
+	if last, exists := ra.lastRate[newRate.String()]; exists {
+		rc.Old = last
 	}
 
-	// Add " (+12%)" to the notification
-	compare := newRate.Rate / last.Rate
-	if newRate.Rate > last.Rate {
-		msg.WriteString(" (+")
-	} else {
-		msg.WriteString(" (-")
-	}
-	msg.WriteString(fmt.Sprintf("%.2f%%)", compare*100))
-
-	return ra.notifier.Notify(msg.String())
+	return ra.notifier.Notify(ctx, rc)
 }

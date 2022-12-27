@@ -7,12 +7,12 @@ import (
 
 type TickerChecker struct {
 	ticker  *time.Ticker
-	checker CheckerInterface
+	checker Checker
 }
 
 func NewTickerChecker(
 	ticker *time.Ticker,
-	checker CheckerInterface,
+	checker Checker,
 ) *TickerChecker {
 	return &TickerChecker{
 		ticker:  ticker,

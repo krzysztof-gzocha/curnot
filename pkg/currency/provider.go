@@ -1,25 +1,26 @@
 package currency
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/krzysztof-gzocha/curnot/pkg/config"
 )
 
-type ProviderInterface interface {
-	GetCurrencyExchangeFactor(base, second string) (float64, error)
+type Provider interface {
+	GetCurrencyExchangeFactor(ctx context.Context, base, second string) (float64, error)
 }
 
-type HttpClientInterface interface {
-	Get(url string) (resp *http.Response, err error)
+type HttpDoer interface {
+	Do(req *http.Request) (*http.Response, error)
 }
 
 // GetProvidersPool will return map of pointers to providers ready to be used
 func GetProvidersPool(
-	client HttpClientInterface,
+	client HttpDoer,
 	providerConfigs map[string]config.ProviderConfig,
-) map[string]ProviderInterface {
-	providers := map[string]ProviderInterface{}
+) map[string]Provider {
+	providers := map[string]Provider{}
 
 	openExchange, exists := providerConfigs[NameOpenExchangeRates]
 	if exists {

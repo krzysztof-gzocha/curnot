@@ -1,32 +1,41 @@
 package notifier
 
 import (
+	"context"
+	"net/http"
+	"net/url"
+
 	"github.com/go-mail/mail"
 	"github.com/krzysztof-gzocha/curnot/pkg/aggregator"
 	"github.com/krzysztof-gzocha/curnot/pkg/config"
 	"github.com/krzysztof-gzocha/curnot/pkg/formatter"
 )
 
-const NameDesktopNotifier = "desktop"
-const NameEmailNotifier = "email"
+const NameNotifierDesktop = "desktop"
+const NameNotifierEmail = "email"
+const NameNotifierHttp = "http"
 
 type Provider interface {
-	GetNotifiers() []aggregator.NotifierInterface
+	GetNotifiers() []aggregator.Notifier
 }
 
 type Chain struct {
+	client         *http.Client
 	notifierConfig map[string]config.NotifierConfig
 }
 
-func NewChain(notifierConfig map[string]config.NotifierConfig) *Chain {
-	return &Chain{notifierConfig: notifierConfig}
+func NewChain(c *http.Client, notifierConfig map[string]config.NotifierConfig) *Chain {
+	return &Chain{client: c, notifierConfig: notifierConfig}
 }
 
-func (c *Chain) Notify(msg string) error {
-	notifiers := c.GetNotifiers()
+func (c *Chain) Notify(ctx context.Context, msg aggregator.RateChange) error {
+	notifiers, err := c.GetNotifiers(c.client)
+	if err != nil {
+		return err
+	}
 
 	for _, n := range notifiers {
-		err := n.Notify(msg)
+		err := n.Notify(ctx, msg)
 
 		if err != nil {
 			return err
@@ -36,10 +45,10 @@ func (c *Chain) Notify(msg string) error {
 	return nil
 }
 
-func (c *Chain) GetNotifiers() []aggregator.NotifierInterface {
-	var notifiers []aggregator.NotifierInterface
+func (c *Chain) GetNotifiers(client *http.Client) ([]aggregator.Notifier, error) {
+	var notifiers []aggregator.Notifier
 
-	emailNotifierConfig, exists := c.notifierConfig[NameEmailNotifier]
+	emailNotifierConfig, exists := c.notifierConfig[NameNotifierEmail]
 
 	if exists {
 		dialer := mail.NewDialer(
@@ -59,11 +68,26 @@ func (c *Chain) GetNotifiers() []aggregator.NotifierInterface {
 		notifiers = append(notifiers, notifier)
 	}
 
-	_, exists = c.notifierConfig[NameDesktopNotifier]
+	_, exists = c.notifierConfig[NameNotifierDesktop]
 
 	if exists {
 		notifiers = append(notifiers, NewDesktop())
 	}
 
-	return notifiers
+	httpConfig, exists := c.notifierConfig[NameNotifierHttp]
+	if exists {
+		u, err := url.Parse(httpConfig.HttpParameters.Path)
+		if err != nil {
+			return notifiers, err
+		}
+
+		notifiers = append(notifiers, NewHttp(
+			client,
+			*u,
+			httpConfig.HttpParameters.Method,
+			httpConfig.HttpParameters.AcceptedResponseStatuses,
+		))
+	}
+
+	return notifiers, nil
 }

@@ -1,9 +1,10 @@
 package currency
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -13,11 +14,11 @@ import (
 const NameCurrencyConverter = "currencyConverter"
 
 type CurrencyConverterProvider struct {
-	client HttpClientInterface
+	client HttpDoer
 	apiKey string
 }
 
-func NewCurrencyConverterProvider(client HttpClientInterface, apiKey string) *CurrencyConverterProvider {
+func NewCurrencyConverterProvider(client HttpDoer, apiKey string) *CurrencyConverterProvider {
 	return &CurrencyConverterProvider{
 		client: client,
 		apiKey: apiKey,
@@ -25,15 +26,20 @@ func NewCurrencyConverterProvider(client HttpClientInterface, apiKey string) *Cu
 }
 
 func (c *CurrencyConverterProvider) GetCurrencyExchangeFactor(
+	ctx context.Context,
 	base,
 	second string,
 ) (float64, error) {
-	response, err := c.client.Get(c.buildUrl(c.apiKey, base, second))
+	req, err := http.NewRequest(http.MethodGet, c.buildUrl(c.apiKey, base, second), nil)
+	if err != nil {
+		return 0, err
+	}
+	response, err := c.client.Do(req.WithContext(ctx))
 	if err != nil {
 		return 0, err
 	}
 
-	content, err := ioutil.ReadAll(response.Body)
+	content, err := io.ReadAll(response.Body)
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
