@@ -19,7 +19,7 @@ archives:
       - goos: windows
         format: zip
     files:
-      - config.yml
+      - curnot.yaml
 checksum:
   name_template: 'checksums.txt'
 snapshot:

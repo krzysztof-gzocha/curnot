@@ -2,47 +2,71 @@ package notifier
 
 import (
 	"context"
-	"fmt"
+	"html/template"
+	"log"
 
-	"github.com/go-mail/mail"
 	"github.com/krzysztof-gzocha/curnot/pkg/aggregator"
 	"github.com/krzysztof-gzocha/curnot/pkg/config"
-	"github.com/krzysztof-gzocha/curnot/pkg/formatter"
+	"github.com/wneessen/go-mail"
 )
 
+const bodyTemplate = "<p>{{ . }}</p>"
+
 type Email struct {
-	dialer               mail.Dialer
+	client               *mail.Client
+	contentType          mail.ContentType
 	receiverParameters   config.EmailReceiverParameters
 	connectionParameters config.EmailConnectionParameters
-	formatter            formatter.MessageFormatStrategy
 }
 
 func NewEmail(
-	dialer mail.Dialer,
+	client *mail.Client,
+	contentType mail.ContentType,
 	receiverParameters config.EmailReceiverParameters,
 	connectionParameters config.EmailConnectionParameters,
-	formatter formatter.MessageFormatStrategy) *Email {
+) *Email {
 	return &Email{
-		dialer:               dialer,
+		client:               client,
+		contentType:          contentType,
 		receiverParameters:   receiverParameters,
 		connectionParameters: connectionParameters,
-		formatter:            formatter,
 	}
 }
 
-func (e *Email) Notify(_ context.Context, msg aggregator.RateChange) error {
-	fmt.Println("Sending email")
+func (e *Email) Notify(ctx context.Context, rc aggregator.RateChange) error {
+	log.Println("Sending email")
 
-	return e.dialer.DialAndSend(e.getMessage(msg.String()))
+	msg, err := e.getMessage(rc.String())
+
+	if err != nil {
+		return err
+	}
+
+	return e.client.DialAndSendWithContext(ctx, msg)
 }
 
-func (e *Email) getMessage(body string) *mail.Message {
-	message := mail.NewMessage()
+func (e *Email) getMessage(body string) (*mail.Msg, error) {
+	msg := mail.NewMsg()
 
-	message.SetHeader("From", e.connectionParameters.Username)
-	message.SetHeader("To", e.receiverParameters.Email)
-	message.SetHeader("Subject", aggregator.NotificationTitle)
-	message.SetBody(e.formatter.Format(body))
+	if err := msg.From(e.connectionParameters.Username); err != nil {
+		return nil, err
+	}
 
-	return message
+	if err := msg.To(e.receiverParameters.Email); err != nil {
+		return nil, err
+	}
+	t, err := template.New("tmpl").Parse(bodyTemplate)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if err := msg.SetBodyHTMLTemplate(t, body); err != nil {
+		return nil, err
+	}
+
+	msg.Subject(aggregator.NotificationTitle)
+	msg.SetBodyString(e.contentType, body)
+
+	return msg, nil
 }

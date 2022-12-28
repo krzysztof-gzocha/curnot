@@ -3,11 +3,10 @@ package currency
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
-
-	"github.com/pkg/errors"
 )
 
 const NameOpenExchangeRates = "openExchangeRates"
@@ -39,22 +38,22 @@ func (cp *OpenExchangeProvider) GetCurrencyExchangeFactor(ctx context.Context, b
 	defer response.Body.Close()
 
 	if err != nil {
-		return 0, errors.Wrapf(err, "Could not read response body for %s/%s", base, second)
+		return 0, fmt.Errorf("could not read response body for %s/%s: %w", base, second, err)
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return 0, errors.Errorf("Response status: %d. Content: '%s'", response.StatusCode, string(content))
+		return 0, fmt.Errorf("response status: %d. Content: '%s'", response.StatusCode, string(content))
 	}
 
 	responseBody := openExchangeResponse{}
 	err = json.Unmarshal(content, &responseBody)
 	if err != nil {
-		return 0, errors.Wrapf(err, "Could not unmarshal response body: %s", content)
+		return 0, fmt.Errorf("could not unmarshal response body: %s", content)
 	}
 
 	rate, exists := responseBody.Rates[second]
 	if !exists {
-		return 0, errors.Errorf("Rate for %s/%s was missing in the response: %s", base, second, string(content))
+		return 0, fmt.Errorf("rate for %s/%s was missing in the response: %s", base, second, string(content))
 	}
 
 	return rate, nil
