@@ -8,8 +8,10 @@ github.com/jinzhu/configor v1.2.1 h1:OKk9dsR8i6HPOCZR8BcMtcEImAFjIhbJFZNyn5GCZko
 github.com/jinzhu/configor v1.2.1/go.mod h1:nX89/MOmDba7ZX7GCyU/VIaQ2Ar2aizBl2d3JLF/rDc=
 github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d h1:VhgPp6v9qf9Agr/56bj7Y/xa04UccTW04VP0Qed4vnQ=
 github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d/go.mod h1:YUTz3bUH2ZwIWBy3CJBeOBEugqcmXREj14T+iG/4k4U=
-github.com/wneessen/go-mail v0.3.6 h1:hT8PMIBdcTkoiDwoUGJssPYOe1Gg1/cUcp2o9+ls63o=
-github.com/wneessen/go-mail v0.3.6/go.mod h1:m25lkU2GYQnlVr6tdwK533/UXxo57V0kLOjaFYmub0E=
+github.com/wneessen/go-mail v0.7.1 h1:rvy63sp14N06/kdGqCYwW8Na5gDCXjTQM1E7So4PuKk=
+github.com/wneessen/go-mail v0.7.1/go.mod h1:+TkW6QP3EVkgTEqHtVmnAE/1MRhmzb8Y9/W3pweuS+k=
+golang.org/x/text v0.29.0 h1:1neNs90w9YzJ9BocxfsQNHKuAT4pkghyXc4nhZ6sJvk=
+golang.org/x/text v0.29.0/go.mod h1:7MhJOA9CD2qZyOKYazxdYMF85OwPdEr9jTtBpO7ydH4=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
